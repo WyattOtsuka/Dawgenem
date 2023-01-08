@@ -8,12 +8,7 @@ import time
 import asyncio
 from aiohttp import ClientSession
 
-
-per_second_rate = RequestRate(19, Duration.SECOND) # 20 requests per second
-minute_rate = RequestRate(99, Duration.MINUTE * 2) # 100 requests per 2 minutes
-limiter = Limiter(per_second_rate, minute_rate)
-
-
+limiter = None
 data = None
 
 with open('./secrets/secret.json') as f:
@@ -94,7 +89,7 @@ def process_match_data(match_data, puuid):
 
     return calculate.calculate(startdate, outcome, champ, kda)
 
-async def get_info(username):
+async def get_data_and_calculate_score(username):
     print(f'Entering get_info with uname {username}')
     puuid = get_summoner_puuid_by_name(username)
     if puuid == None:
@@ -141,6 +136,11 @@ async def get_info(username):
         print(score/(count-1))
         return(str(score/(count-1)))
 
+def get_score(username, rate_limiter):
+    global limiter
+    limiter = rate_limiter    
+    return asyncio.run(get_data_and_calculate_score(username))
+
 def loading(max):
     count = 0
     while count < max:
@@ -155,7 +155,3 @@ def loading(max):
         elif count % 4 == 3:
             loading = "-"
         print ("\r", loading, end="")
-
-async def fetch(url, session):
-    async with session.get(url) as response:
-        return await response.read()

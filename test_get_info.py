@@ -1,11 +1,14 @@
 import get_info
-import asyncio
 import time
+from pyrate_limiter import Duration, RequestRate, Limiter, BucketFullException
+
+
+per_second_rate = RequestRate(19, Duration.SECOND) # 20 requests per second
+minute_rate = RequestRate(99, Duration.MINUTE * 2) # 100 requests per 2 minutes
+limiter = Limiter(per_second_rate, minute_rate)
 
 start_time = time.time()
-loop = asyncio.get_event_loop()
-future = asyncio.ensure_future(get_info.get_info("wwwwwwwwwwwwyatt"))
-loop.run_until_complete(future)
+get_info.get_score("wwwwwwwwwwwwyatt", limiter)
 dif = time.time() - start_time
 
 print("Program ran in %.2f seconds" % dif)

@@ -1,9 +1,15 @@
-from flask import Flask, render_template, send_from_directory, request
+from flask import Flask, render_template, send_from_directory, request, session
 import json
 import pandas as pd
 import get_info
+from pyrate_limiter import Duration, RequestRate, Limiter, BucketFullException
+
 
 app = Flask(__name__)
+
+per_second_rate = RequestRate(19, Duration.SECOND) # 20 requests per second
+minute_rate = RequestRate(99, Duration.MINUTE * 2) # 100 requests per 2 minutes
+limiter = Limiter(per_second_rate, minute_rate)
 
 @app.route("/")
 @app.route("/home")
@@ -42,7 +48,7 @@ def search():
     username = request.args.get('username')
     if username != "":
         print (f"Search: Valid username passed in, {username}")
-        score = get_info.get_info(username)
+        score = get_info.get_score(username, limiter)
         return score
     else:
         print("Search: Empty Username")
