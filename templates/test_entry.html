@@ -1,0 +1,74 @@
+<html>
+
+<head>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4963099746269601" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/home.css') }}">
+    <title>Webapp Progresss Blog</title>
+
+    <script>
+        function setButtons(drop) {
+            var options = ["Q", "W", "E", "R", "AA"]
+            hostDiv = document.getElementById("selectorDiv")
+
+            for (var j = 0; j < 10; j++) {
+                var element = document.getElementById(j);
+                if (element != null) {
+                    element.parentNode.removeChild(element);
+                }
+            }
+
+            for (var i = 0; i < drop.value; i++) {
+                newSelector = document.createElement("select")
+                newSelector.id = i
+                for (var j = 0; j < options.length; j++) {
+                    var option = document.createElement("option");
+                    option.value = options[j];
+                    option.text = options[j];
+                    newSelector.appendChild(option);
+                }
+                hostDiv.appendChild(newSelector)
+            }
+
+        }
+    </script>
+    <style>
+        p {
+            color: white
+        }
+    </style>
+</head>
+
+<body class="bgdiv">
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/updateLog">Updates</a></li>
+        <li><a href="/test_entry">Calculator</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+    </ul>
+    <div class="bb1"></div>
+    <div class="centerBox">
+        <p>This is the test entry page for testing buttons and refreshing.</p>
+        <div id="buttons">
+            <select id="selectButtons">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+            </select>
+        </div>
+        <button type="button" onclick="setButtons(document.getElementById('selectButtons'))">Submit</button>
+
+    </div>
+    <div id="selectorDiv" class="centerBox">
+        <p id="demo">Select Ability Order Here</p>
+    </div>
+
+</body>
+
+</html>

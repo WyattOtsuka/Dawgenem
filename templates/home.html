@@ -1,0 +1,67 @@
+<html>
+
+<head>
+    <!--<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4963099746269601" crossorigin="anonymous"></script>-->
+    <script src="http://code.jquery.com/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/home.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        p {
+            color: white
+        }
+    </style>
+
+    
+    <script type=text/javascript>
+        $(function() {
+          $('a#searchButton').on('click', function(e) {
+            e.preventDefault()
+            $.getJSON('/search', { username: document.getElementById("searchBar").value }, function(data) {
+                console.log(data)
+                var scoreTags = document.getElementById('scoreTag');
+                scoreTag.textContent = data
+            });
+            return false;
+          });
+
+          $('#searchBar').on("keydown", function (e) {
+            if(e.keyCode === 13){
+                e.preventDefault(); // Ensure it is only this code that runs
+                $.getJSON('/search', { username: document.getElementById("searchBar").value }, function(data) {
+                    console.log(data)
+                    var scoreTags = document.getElementById('scoreTag');
+                    scoreTag.textContent = data
+                });
+                return false;
+            }
+        })
+        });
+        
+        
+    </script>
+</head>
+
+<body class="bgdiv">
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/updateLog">Updates</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+    </ul>
+    <div class="wrap">
+        <div class="search">
+            <form id=test>
+                <input type="text" class="searchTerm" placeholder="Username" id="searchBar">
+            </form>
+            <form>
+                <a href=# id=searchButton><button type="submit" class="searchButton">
+                    <i class="fa fa-search"></i>
+                </button></a>
+            </form>
+        </div>
+        <div>
+            <h2 id="scoreTag"></h2>
+        </div>
+</body>
+
+</html>
