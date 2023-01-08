@@ -123,7 +123,7 @@ async def get_data_and_calculate_score(username):
 
         tasks = []
         score = 0
-        async with ClientSession() as session:
+        async with ClientSession(trust_env=True) as session:
             for match_id in matches:
                 count += 1
                 task = asyncio.ensure_future(get_match_by_match_id(match_id, session, count))
