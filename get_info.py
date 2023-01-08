@@ -43,7 +43,7 @@ def get_summoner_puuid_by_name(name, prev_err = False):
     else:
         return resp.json()["puuid"]
         
-def get_matches_by_puuid(puuid, start = 0, count = 85, prev_err = False):
+def get_matches_by_puuid(puuid, start = 0, count = 25, prev_err = False):
     print(f'Entering get_matches_by_puuid with puuid {puuid}')
     url = "https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/" + puuid + "/ids"
     url += f"?start={start}&count={count}"
