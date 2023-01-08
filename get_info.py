@@ -9,8 +9,8 @@ import asyncio
 from aiohttp import ClientSession
 
 
-per_second_rate = RequestRate(20, Duration.SECOND) # 20 requests per second
-minute_rate = RequestRate(100, Duration.MINUTE * 2) # 100 requests per 2 minutes
+per_second_rate = RequestRate(19, Duration.SECOND) # 20 requests per second
+minute_rate = RequestRate(99, Duration.MINUTE * 2) # 100 requests per 2 minutes
 limiter = Limiter(per_second_rate, minute_rate)
 
 
@@ -48,7 +48,7 @@ def get_summoner_puuid_by_name(name, prev_err = False):
     else:
         return resp.json()["puuid"]
         
-def get_matches_by_puuid(puuid, start = 0, count = 30, prev_err = False):
+def get_matches_by_puuid(puuid, start = 0, count = 85, prev_err = False):
     print(f'Entering get_matches_by_puuid with puuid {puuid}')
     url = "https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/" + puuid + "/ids"
     url += f"?start={start}&count={count}"
@@ -72,27 +72,17 @@ def get_matches_by_puuid(puuid, start = 0, count = 30, prev_err = False):
     else:
         return resp.json()
     
-async def get_match_by_match_id(id: str, prev_err = False):
+async def get_match_by_match_id(id: str, session, count):
     url = "https://americas.api.riotgames.com/lol/match/v5/matches/" + id
-    try:
-        limiter.try_acquire('identity')
-        resp = requests.get(url, headers=headers)
-    except BucketFullException as err:
-        if not prev_err:
-            print("\nRate Limited in get_match_by_match_id!")
-            print(f"\t{err}")
-            print(f"\tSleeping for {err.meta_info['remaining_time'] + 1}")
-            loading(err.meta_info['remaining_time'] + 1)
-            return get_match_by_match_id(id, True)
-        else:
-            print("Errored out twice on get_match_by_match_id!")
-            print(f"\t{err}")
+    async with limiter.ratelimit('identity', delay = True):
+        async with session.get(url, headers=headers) as resp:
+            if resp.status != 200:
+                print(f"Non-200 in get_match_by_match_id. Idx {count}")
+                print("\t" + await resp.text())
+            else:
+                return await resp.json()
+        
     
-    if resp.status_code != 200:
-        print("Non-200 in get_match_by_match_id")
-        print("\t" + resp.text)
-    else:
-        return await resp.json()
 
 def process_match_data(match_data, puuid):
     player_position = match_data['metadata']['participants'].index(puuid)
@@ -104,10 +94,6 @@ def process_match_data(match_data, puuid):
 
     return calculate.calculate(startdate, outcome, champ, kda)
 
-async def gather_match_data_and_calculate_score(matches):
-
-
-
 async def get_info(username):
     print(f'Entering get_info with uname {username}')
     puuid = get_summoner_puuid_by_name(username)
@@ -117,7 +103,6 @@ async def get_info(username):
         start = 0
         matches = []
         count = 1
-        loading = ""
 
         match_list = get_matches_by_puuid(puuid)
         matches.extend(match_list)
@@ -146,11 +131,11 @@ async def get_info(username):
         async with ClientSession() as session:
             for match_id in matches:
                 count += 1
-                task = asyncio.ensure_future(get_match_by_match_id(match_id))
-
-                match_data = get_match_by_match_id(match_id)
-                score += process_match_data(await match_data, puuid)
-                print ("\r", " Completed ", count, " requests", end="")
+                task = asyncio.ensure_future(get_match_by_match_id(match_id, session, count))
+                tasks.append(task)
+            responses = await asyncio.gather(*tasks)
+            for response in responses:
+                score += process_match_data(response, puuid)
 
         print("\n")
         print(score/(count-1))
