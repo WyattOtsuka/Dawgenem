@@ -9,6 +9,9 @@
         p {
             color: white
         }
+        h2 {
+            color: white 
+        }
     </style>
 
     
@@ -16,25 +19,36 @@
         $(function() {
           $('a#searchButton').on('click', function(e) {
             e.preventDefault()
-            $.getJSON('/search', { username: document.getElementById("searchBar").value }, function(data) {
-                console.log(data)
-                var scoreTags = document.getElementById('scoreTag');
-                scoreTag.textContent = data
-            });
-            return false;
+            return get_score()
           });
 
           $('#searchBar').on("keydown", function (e) {
             if(e.keyCode === 13){
                 e.preventDefault(); // Ensure it is only this code that runs
-                $.getJSON('/search', { username: document.getElementById("searchBar").value }, function(data) {
-                    console.log(data)
-                    var scoreTags = document.getElementById('scoreTag');
-                    scoreTag.textContent = data
-                });
-                return false;
+                return get_score()
             }
         })
+
+        function get_score() {
+            var scoreTags = document.getElementById('scoreTag');
+            var username = document.getElementById("searchBar").value
+            if (username != "") {
+                scoreTag.textContent = "Barking at rito...";
+                $.get('/search', { username: document.getElementById("searchBar").value }, function(data) {                
+                    console.log("hitting here")
+                    if (data  === "err") {
+                        scoreTag.textContent = "Uh Oh! Something broke! Better nerf Irelia"
+                    } else if (data == "NotFound") {
+                        scoreTag.textContent = "Summoner not found! Must be a cat..."
+                    } else {
+                        scoreTag.textContent = data
+                    }
+                });
+            } else {
+                scoreTag.textContent = "Enter a username to get started!"
+            }
+            return false;
+        }
         });
         
         
@@ -42,26 +56,21 @@
 </head>
 
 <body class="bgdiv">
-    <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/updateLog">Updates</a></li>
-        <li><a href="/about">About</a></li>
-        <li><a href="/privacy">Privacy</a></li>
-    </ul>
     <div class="wrap">
         <div class="search">
-            <form id=test>
+            <form class="searchBarForm" id=test>
                 <input type="text" class="searchTerm" placeholder="Username" id="searchBar">
             </form>
-            <form>
+            <form class="searchButtonForm">
                 <a href=# id=searchButton><button type="submit" class="searchButton">
                     <i class="fa fa-search"></i>
                 </button></a>
             </form>
         </div>
-        <div>
-            <h2 id="scoreTag"></h2>
         </div>
+    <div class="scoreDiv">
+        <h2 id="scoreTag"></h2>
+    </div>
 </body>
 
 </html>

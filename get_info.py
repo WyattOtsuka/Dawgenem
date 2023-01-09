@@ -37,9 +37,12 @@ def get_summoner_puuid_by_name(name, prev_err = False):
             print("Errored out twice on get_summoner_puuid_by_name!")
             print(f"\t{err}")
 
-    if resp.status_code != 200:
+    if resp.status_code == 404:
+        return "Summoner Not Found"
+    elif resp.status_code != 200:
         print("Non-200 in get_summoner_puuid_by_name")
         print("\t" + resp.text)
+        
     else:
         return resp.json()["puuid"]
         
@@ -89,11 +92,14 @@ def process_match_data(match_data, puuid):
 
     return calculate.calculate(startdate, outcome, champ, kda)
 
-async def get_data_and_calculate_score(username):
+async def get_data_and_calculate_score(username) -> str:
     print(f'Entering get_info with uname {username}')
     puuid = get_summoner_puuid_by_name(username)
     if puuid == None:
-        print("400 Error in getting puuid")
+        print("Error in getting puuid")
+        return "err"
+    elif puuid == "Summoner Not Found":
+        return "NotFound"
     else:
         start = 0
         matches = []
@@ -132,8 +138,6 @@ async def get_data_and_calculate_score(username):
             for response in responses:
                 score += process_match_data(response, puuid)
 
-        print("\n")
-        print(score/(count-1))
         return(str(score/(count-1)))
 
 def get_score(username, rate_limiter):
