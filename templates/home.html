@@ -19,11 +19,13 @@
         $(function() {
           $('a#searchButton').on('click', function(e) {
             e.preventDefault()
+            console.log("Search Button Clicked")
             return get_score()
           });
 
           $('#searchBar').on("keydown", function (e) {
             if(e.keyCode === 13){
+                console.log("Enter Pressed")
                 e.preventDefault(); // Ensure it is only this code that runs
                 return get_score()
             }
