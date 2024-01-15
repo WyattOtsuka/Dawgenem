@@ -30,18 +30,25 @@
         })
 
         function get_score() {
-            var scoreTags = document.getElementById('scoreTag');
+            var scoreTag0 = document.getElementById('scoreTag0');
             var username = document.getElementById("searchBar").value
             if (username != "") {
-                scoreTag.textContent = "Barking at rito...";
+                scoreTag0.textContent = "Barking at rito...";
+                scoreTag1.textContent = "";
+                scoreTag2.textContent = "";
+                scoreTag3.textContent = "";
                 $.get('/search', { username: document.getElementById("searchBar").value }, function(data) {                
                     console.log("hitting here")
                     if (data  === "err") {
-                        scoreTag.textContent = "Uh Oh! Something broke! Better nerf Irelia"
+                        scoreTag0.textContent = "Uh Oh! Something broke! Better nerf Irelia"
                     } else if (data == "NotFound") {
-                        scoreTag.textContent = "Summoner not found! Must be a cat..."
+                        scoreTag0.textContent = "Summoner not found! Must be a cat..."
                     } else {
-                        scoreTag.textContent = data
+                        var scores = data.split(",")
+                        scoreTag0.textContent = scores[0]
+                        scoreTag1.textContent = scores[1]
+                        scoreTag2.textContent = scores[2]
+                        scoreTag3.textContent = scores[3]
                     }
                 });
             } else {
@@ -69,7 +76,10 @@
         </div>
     </div>
     <div class="scoreDiv">
-        <h2 id="scoreTag"></h2>
+        <h2 id="scoreTag0"></h2>
+        <h2 id="scoreTag1"></h2>
+        <h2 id="scoreTag2"></h2>
+        <h2 id="scoreTag3"></h2>
     </div>
 </body>
 </html>
