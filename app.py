@@ -48,8 +48,8 @@ def search():
     username = request.args.get('username')
     if username != "":
         print (f"Search: Valid username passed in, {username}")
-        score = get_info.get_score(username, limiter)
-        return score
+        results = get_info.get_score(username, limiter)
+        return results
     else:
         print("Search: Empty Username")
         return 

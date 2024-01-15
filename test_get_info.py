@@ -8,7 +8,9 @@ minute_rate = RequestRate(99, Duration.MINUTE * 2) # 100 requests per 2 minutes
 limiter = Limiter(per_second_rate, minute_rate)
 
 start_time = time.time()
-get_info.get_score("wwwwwwwwwwwwyatt", limiter)
+scores = get_info.get_score("wwwwwwwwwwwwyatt", limiter)
 dif = time.time() - start_time
 
 print("Program ran in %.2f seconds" % dif)
+
+print(scores)

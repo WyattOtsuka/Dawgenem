@@ -2,7 +2,7 @@ import calculate
 import requests
 import json
 import pandas as pd
-from pyrate_limiter import Duration, RequestRate, Limiter, BucketFullException
+from pyrate_limiter import BucketFullException
 import datetime as dt
 import time
 import asyncio
@@ -46,7 +46,7 @@ def get_summoner_puuid_by_name(name, prev_err = False):
     else:
         return resp.json()["puuid"]
         
-def get_matches_by_puuid(puuid, start = 0, count = 25, prev_err = False):
+def get_matches_by_puuid(puuid, start = 0, count = 10, prev_err = False):
     print(f'Entering get_matches_by_puuid with puuid {puuid}')
     url = "https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/" + puuid + "/ids"
     url += f"?start={start}&count={count}"
@@ -83,6 +83,10 @@ async def get_match_by_match_id(id: str, session, count):
     
 
 def process_match_data(match_data, puuid):
+    '''
+    Takes in a match to process, and a player id. Returns the following array: [overall score, dog/cat points, moon phase points, kda points].
+    '''
+
     player_position = match_data['metadata']['participants'].index(puuid)
     player_stats = match_data['info']['participants'][player_position]
     kda = (player_stats['kills'] + player_stats['assists']) / player_stats['deaths'] if player_stats['deaths'] > 0 else (player_stats['kills'] + player_stats['assists']) * 2
@@ -91,6 +95,8 @@ def process_match_data(match_data, puuid):
     champ = player_stats["championName"]
 
     return calculate.calculate(startdate, outcome, champ, kda)
+
+    
 
 async def get_data_and_calculate_score(username) -> str:
     print(f'Entering get_info with uname {username}')
@@ -128,7 +134,10 @@ async def get_data_and_calculate_score(username) -> str:
         #        break
 
         tasks = []
-        score = 0
+        overall_score = 0
+        moon_points = 0
+        dog_cat_points = 0
+        kda_points = 0
         async with ClientSession(trust_env=True) as session:
             for match_id in matches:
                 count += 1
@@ -136,9 +145,13 @@ async def get_data_and_calculate_score(username) -> str:
                 tasks.append(task)
             responses = await asyncio.gather(*tasks)
             for response in responses:
-                score += process_match_data(response, puuid)
-
-        return(str(score/(count-1)))
+                results = process_match_data(response, puuid)
+                overall_score += results[0]
+                moon_points += results[1]
+                dog_cat_points += results[2]
+                kda_points += results[3]
+        normalized_results = [points / (count - 1) for points in results]
+        return(normalized_results)
 
 def get_score(username, rate_limiter):
     global limiter
