@@ -39,6 +39,7 @@
                 scoreTag1.textContent = "";
                 scoreTag2.textContent = "";
                 scoreTag3.textContent = "";
+                description0.textContent = "";
                 $.get('/search', { username: document.getElementById("searchBar").value }, function(data) {                
                     console.log("hitting here")
                     if (data  === "err") {
@@ -48,9 +49,27 @@
                     } else {
                         var scores = data.split(",")
                         scoreTag0.textContent = scores[0]
+                        console.log(Number(scores[0].substring(15)))
+                        console.log(typeof(Number(scores[0].substring(15))))
+                        console.log(Number(scores[0].substring(15)) > 75)
+                        switch (true) {
+                            case Number(scores[0].substring(15)) > 75:
+                                description0.textContent = "Congratulations! You are one of the few players who truly has got that dog in them."
+                                break;
+                            case Number(scores[0].substring(15)) > 50:
+                                description0.textContent = "You might not be the furriest player in the game, but you know how to channel that inner dog when the time calls."
+                                break;
+                            case Number(scores[0].substring(15)) > 25:
+                                description0.textContent = "If you squint your eyes, you can sometimes make out some dog ears and a tail."
+                                break;
+                            default:
+                                description0.textContent = "What you lack in doggy-ness, you make up for in spades with personality."
+                                break;
+                        }
                         scoreTag1.textContent = scores[1]
                         scoreTag2.textContent = scores[2]
                         scoreTag3.textContent = scores[3]
+
                     }
                 });
             } else {
@@ -79,6 +98,7 @@
     </div>
     <div class="scoreDiv">
         <h2 id="scoreTag0"></h2>
+        <p id="description0"></p>
         <h2 id="scoreTag1"></h2>
         <h2 id="scoreTag2"></h2>
         <h2 id="scoreTag3"></h2>

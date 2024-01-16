@@ -150,7 +150,7 @@ async def get_data_and_calculate_score(username) -> str:
                 moon_points += results[1]
                 dog_cat_points += results[2]
                 kda_points += results[3]
-        normalized_results = [points / (count - 1) for points in results]
+        normalized_results = [100* points / (count - 1) for points in results]
         return(normalized_results)
 
 def get_score(username, rate_limiter):

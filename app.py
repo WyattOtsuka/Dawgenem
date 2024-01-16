@@ -49,7 +49,7 @@ def search():
     if username != "":
         print (f"Search: Valid username passed in, {username}")
         results = get_info.get_score(username, limiter)
-        return "Overall score:\t{0:.2f},Moon score:\t{0:.2f},Dog Cat score:\t{0:.2f},KDA score:\t\t{0:.2f}".format(results[0], results[1], results[2], results[3])
+        return "Overall score: {0:.0f},Moon score: {1:.0f},Dog Cat score: {2:.0f},KDA score: {3:.0f}".format(results[0], results[1], results[2], results[3])
     else:
         print("Search: Empty Username")
         return 

@@ -49,7 +49,7 @@ body{
   position: absolute;
   top: 35%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -10%);
 }
 
 /*Resize the wrap to see the search bar change!*/
@@ -58,7 +58,7 @@ body{
   position: absolute;
   top: 30%;
   left: 50%;
-  transform: translate(-50%, -10%);
+  transform: translate(-50%, -50%);
 }
 
 .bgdiv {
